@@ -1,0 +1,101 @@
+[ {
+  "id" : "a1b2c3d4-0001-4e5f-8a9b-c0d1e2f30001",
+  "title" : "Set up CI/CD pipeline",
+  "description" : "Configure GitHub Actions to run tests and deploy to staging on every push to main branch.",
+  "status" : "IN_PROGRESS",
+  "category" : "DevOps",
+  "assignedTo" : "Sarah Chen",
+  "dueDate" : "2026-04-18T00:00:00",
+  "createdAt" : "2026-04-01T09:15:00",
+  "updatedAt" : "2026-04-08T14:30:00"
+}, {
+  "id" : "a1b2c3d4-0002-4e5f-8a9b-c0d1e2f30002",
+  "title" : "Design database schema for orders module",
+  "description" : "Define tables for orders, order_items, and shipping_address. Include indexes and foreign key constraints.",
+  "status" : "DONE",
+  "category" : "Backend",
+  "assignedTo" : "James Patel",
+  "dueDate" : "2026-04-05T00:00:00",
+  "createdAt" : "2026-03-28T10:00:00",
+  "updatedAt" : "2026-04-04T17:45:00"
+}, {
+  "id" : "a1b2c3d4-0004-4e5f-8a9b-c0d1e2f30004",
+  "title" : "Write unit tests for payment service",
+  "description" : "Cover all edge cases: declined cards, expired tokens, duplicate transaction detection, and refund flows.",
+  "status" : "IN_PROGRESS",
+  "category" : "Testing",
+  "assignedTo" : "Marcus Lee",
+  "dueDate" : "2026-04-20T00:00:00",
+  "createdAt" : "2026-04-05T08:45:00",
+  "updatedAt" : "2026-04-09T16:00:00"
+}, {
+  "id" : "a1b2c3d4-0006-4e5f-8a9b-c0d1e2f30006",
+  "title" : "Migrate legacy user auth to OAuth 2.0",
+  "description" : "Replace custom session-based auth with OAuth 2.0 + JWT. Coordinate with frontend team for token refresh strategy.",
+  "status" : "TODO",
+  "category" : "Backend",
+  "assignedTo" : "James Patel",
+  "dueDate" : "2026-05-01T00:00:00",
+  "createdAt" : "2026-04-07T09:00:00",
+  "updatedAt" : "2026-04-07T09:00:00"
+}, {
+  "id" : "a1b2c3d4-0007-4e5f-8a9b-c0d1e2f30007",
+  "title" : "Dashboard performance optimisation",
+  "description" : "Dashboard takes ~4s to load. Profile queries, add caching for aggregate stats, and lazy-load chart data.",
+  "status" : "IN_PROGRESS",
+  "category" : "Frontend",
+  "assignedTo" : "Priya Nair",
+  "dueDate" : "2026-04-17T00:00:00",
+  "createdAt" : "2026-04-02T15:30:00",
+  "updatedAt" : "2026-04-09T10:15:00"
+}, {
+  "id" : "a1b2c3d4-0008-4e5f-8a9b-c0d1e2f30008",
+  "title" : "Conduct sprint retrospective",
+  "description" : "Facilitate end-of-sprint retro for team. Collect feedback on blockers, process improvements, and sprint velocity.",
+  "status" : "DONE",
+  "category" : "Management",
+  "assignedTo" : "Marcus Lee",
+  "dueDate" : "2026-04-04T00:00:00",
+  "createdAt" : "2026-03-30T12:00:00",
+  "updatedAt" : "2026-04-04T18:00:00"
+}, {
+  "id" : "a1b2c3d4-0009-4e5f-8a9b-c0d1e2f30009",
+  "title" : "Integrate email notification service",
+  "description" : "Send transactional emails (order confirmation, password reset) via SendGrid. Template HTML emails with brand styling.",
+  "status" : "TODO",
+  "category" : "Backend",
+  "assignedTo" : "Sarah Chen",
+  "dueDate" : "2026-04-25T00:00:00",
+  "createdAt" : "2026-04-08T10:45:00",
+  "updatedAt" : "2026-04-08T10:45:00"
+}, {
+  "id" : "a1b2c3d4-0010-4e5f-8a9b-c0d1e2f30010",
+  "title" : "Security audit — dependency vulnerabilities",
+  "description" : "Run OWASP dependency check. Upgrade any libraries with known CVEs. Document findings and remediation steps.",
+  "status" : "CANCELLED",
+  "category" : "Security",
+  "assignedTo" : "James Patel",
+  "dueDate" : "2026-04-10T00:00:00",
+  "createdAt" : "2026-03-25T09:30:00",
+  "updatedAt" : "2026-04-09T11:00:00"
+}, {
+  "id" : "a1b2c3d4-0003-4e5f-8a9b-c0d1e2f30003",
+  "title" : "Fix login page layout on mobile",
+  "description" : "The login form overflows on screens narrower than 375px. Needs responsive CSS fix and testing on iOS Safari.",
+  "status" : "TODO",
+  "category" : "Frontend",
+  "assignedTo" : "Priya Nair",
+  "dueDate" : "2026-04-14T00:00:00",
+  "createdAt" : "2026-04-03T11:20:00",
+  "updatedAt" : "2026-04-10T15:32:39"
+}, {
+  "id" : "a1b2c3d4-0005-4e5f-8a9b-c0d1e2f30005",
+  "title" : "Update API documentation",
+  "description" : "Add missing endpoints to Swagger/OpenAPI spec. Include request/response examples for the new reporting APIs.",
+  "status" : "IN_PROGRESS",
+  "category" : "Documentation",
+  "assignedTo" : "Sarah Chen",
+  "dueDate" : "2026-04-22T00:00:00",
+  "createdAt" : "2026-04-06T13:10:00",
+  "updatedAt" : "2026-04-10T15:55:51"
+} ]

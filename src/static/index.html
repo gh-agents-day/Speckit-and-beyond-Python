@@ -1,0 +1,884 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task Manager</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #f0f2f5;
+        --surface: #ffffff;
+        --primary: #4f46e5;
+        --primary-hover: #4338ca;
+        --danger: #ef4444;
+        --danger-hover: #dc2626;
+        --text: #111827;
+        --muted: #6b7280;
+        --border: #e5e7eb;
+        --radius: 8px;
+        --shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+      }
+
+      body {
+        font-family: "Segoe UI", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* ── Header ── */
+      header {
+        background: var(--primary);
+        color: #fff;
+        padding: 0 32px;
+        height: 60px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      }
+      header h1 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+      }
+      header span {
+        font-size: 0.85rem;
+        opacity: 0.8;
+      }
+
+      /* ── Layout ── */
+      main {
+        flex: 1;
+        overflow: hidden;
+        width: 100%;
+        padding: 16px 24px;
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 20px;
+        align-items: stretch;
+      }
+
+      /* ── Form sidebar — full height, internal scroll ── */
+      main > section:first-child {
+        height: 100%;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      main > section:first-child .card {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+
+      .form-fields {
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      /* ── Right panel — full height, internal scroll ── */
+      main > section:last-child {
+        height: 100%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        min-height: 0;
+      }
+
+      .task-list-card {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .task-list-card h2 {
+        flex-shrink: 0;
+      }
+
+      /* ── Card ── */
+      .card {
+        background: var(--surface);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 24px;
+      }
+      .card h2 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 18px;
+        color: var(--text);
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 10px;
+      }
+
+      /* ── Form ── */
+      .form-group {
+        margin-bottom: 14px;
+      }
+      label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+      input[type="text"],
+      input[type="date"],
+      select,
+      textarea {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-family: inherit;
+        color: var(--text);
+        background: #fff;
+        transition: border-color 0.15s;
+      }
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: #fff;
+      }
+      select:disabled {
+        background: #f0f0f0;
+        color: #9ca3af;
+        cursor: not-allowed;
+        opacity: 1;
+      }
+      textarea {
+        resize: vertical;
+        min-height: 72px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-family: inherit;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .btn-primary {
+        background: var(--primary);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: var(--primary-hover);
+      }
+      .btn-danger {
+        background: var(--danger);
+        color: #fff;
+      }
+      .btn-danger:hover {
+        background: var(--danger-hover);
+      }
+      .btn-ghost {
+        background: transparent;
+        color: var(--primary);
+        border: 1px solid var(--primary);
+      }
+      .btn-ghost:hover {
+        background: #ede9fe;
+      }
+      .btn-full {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 4px;
+      }
+
+      /* ── Stats bar ── */
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+      .stat-pill {
+        text-align: center;
+        padding: 12px 8px;
+        border-radius: var(--radius);
+        background: var(--surface);
+        box-shadow: var(--shadow);
+      }
+      .stat-pill .count {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--primary);
+        line-height: 1;
+      }
+      .stat-pill .label {
+        font-size: 0.7rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 4px;
+      }
+
+      /* ── Table ── */
+      .table-wrap {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: auto;
+        width: 100%;
+        min-height: 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+        table-layout: fixed;
+      }
+      col.col-title {
+        width: 30%;
+      }
+      col.col-status {
+        width: 120px;
+      }
+      col.col-category {
+        width: 110px;
+      }
+      col.col-assigned {
+        width: 130px;
+      }
+      col.col-due {
+        width: 100px;
+      }
+      col.col-actions {
+        width: 80px;
+      }
+      thead th {
+        text-align: left;
+        padding: 10px 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--muted);
+        background: #f9fafb;
+        border-bottom: 2px solid var(--border);
+        white-space: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
+      tbody tr {
+        border-bottom: 1px solid var(--border);
+        transition: background 0.1s;
+      }
+      tbody tr:hover {
+        background: #f5f3ff;
+      }
+      tbody td {
+        padding: 10px 12px;
+        vertical-align: middle;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      td.td-title {
+        white-space: normal;
+      }
+      .task-title {
+        font-weight: 600;
+        color: var(--text);
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .task-desc {
+        display: block;
+        color: var(--muted);
+        font-size: 0.78rem;
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      /* ── Badges ── */
+      .badge {
+        display: inline-block;
+        padding: 2px 9px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+      .status-TODO {
+        background: #e0e7ff;
+        color: #3730a3;
+      }
+      .status-IN_PROGRESS {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .status-DONE {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .status-CANCELLED {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      /* ── Row actions ── */
+      .row-actions {
+        display: flex;
+        gap: 6px;
+      }
+      .icon-btn {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        padding: 4px 7px;
+        border-radius: 5px;
+        font-size: 1.1rem;
+        transition: background 0.15s;
+      }
+      .icon-btn.edit {
+        color: var(--primary);
+      }
+      .icon-btn.edit:hover {
+        background: #ede9fe;
+      }
+      .icon-btn.delete {
+        color: var(--danger);
+      }
+      .icon-btn.delete:hover {
+        background: #fee2e2;
+      }
+
+      /* ── Empty state ── */
+      .empty {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--muted);
+      }
+      .empty .icon {
+        font-size: 2.5rem;
+        margin-bottom: 8px;
+      }
+
+      /* ── Confirm Modal ── */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+      }
+      .modal-overlay.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .modal {
+        background: var(--surface);
+        border-radius: var(--radius);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+        padding: 28px 28px 22px;
+        width: 340px;
+        max-width: 90vw;
+        transform: translateY(-12px);
+        transition: transform 0.2s;
+      }
+      .modal-overlay.show .modal {
+        transform: translateY(0);
+      }
+      .modal-icon {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+      }
+      .modal h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 6px;
+      }
+      .modal p {
+        font-size: 0.875rem;
+        color: var(--muted);
+        margin-bottom: 20px;
+        line-height: 1.5;
+      }
+      .modal-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+
+      /* ── Toast ── */
+      #toast {
+        position: fixed;
+        bottom: 28px;
+        right: 28px;
+        background: #1f2937;
+        color: #fff;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+        z-index: 999;
+      }
+      #toast.show {
+        opacity: 1;
+      }
+
+      @media (max-width: 900px) {
+        main {
+          grid-template-columns: 1fr;
+          padding: 12px;
+          overflow-y: auto;
+        }
+        main > section:first-child,
+        main > section:last-child {
+          height: auto;
+          overflow: visible;
+        }
+        .task-list-card {
+          min-height: 400px;
+        }
+        col.col-category,
+        col.col-assigned {
+          width: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>&#128203; Task Manager</h1>
+      <span id="headerDate"></span>
+    </header>
+
+    <main>
+      <!-- ── Form Panel ── -->
+      <section>
+        <div
+          class="card"
+          style="height: 100%; display: flex; flex-direction: column"
+        >
+          <h2 id="formTitle" style="flex-shrink: 0">New Task</h2>
+          <div class="form-fields">
+            <div class="form-group">
+              <label for="f-title"
+                >Title <span style="color: var(--danger)">*</span></label
+              >
+              <input
+                type="text"
+                id="f-title"
+                placeholder="What needs to be done?"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="f-desc">Description</label>
+              <textarea id="f-desc" placeholder="Add more details…"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="f-status"
+                >Status
+                <span style="color: var(--danger)">*</span></label
+              >
+              <select id="f-status" disabled>
+                <option value="TODO">To Do</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="DONE">Done</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="f-category"
+                >Category <span style="color: var(--danger)">*</span></label
+              >
+              <input
+                type="text"
+                id="f-category"
+                placeholder="e.g. Backend, Design…"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="f-assigned">Assigned To</label>
+              <input
+                type="text"
+                id="f-assigned"
+                placeholder="Team member name"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="f-due">Due Date</label>
+              <input type="date" id="f-due" />
+            </div>
+          </div>
+          <!-- /form-fields -->
+
+          <div class="form-actions" style="flex-shrink: 0; padding-top: 8px">
+            <button class="btn btn-primary btn-full" onclick="submitForm()">
+              <span id="submitLabel">&#43; Create Task</span>
+            </button>
+            <button
+              class="btn btn-ghost"
+              id="cancelBtn"
+              style="display: none"
+              onclick="resetForm()"
+            >
+              Cancel
+            </button>
+          </div>
+          <!-- /form-actions -->
+        </div>
+        <!-- /card -->
+      </section>
+
+      <!-- ── Task List Panel ── -->
+      <section>
+        <!-- Stats -->
+        <div class="stats" style="flex-shrink: 0">
+          <div class="stat-pill">
+            <div class="count" id="stat-total">0</div>
+            <div class="label">Total</div>
+          </div>
+          <div class="stat-pill">
+            <div class="count" id="stat-todo">0</div>
+            <div class="label">To Do</div>
+          </div>
+          <div class="stat-pill">
+            <div class="count" id="stat-inprogress">0</div>
+            <div class="label">In Progress</div>
+          </div>
+          <div class="stat-pill">
+            <div class="count" id="stat-done">0</div>
+            <div class="label">Done</div>
+          </div>
+        </div>
+
+        <div class="card task-list-card">
+          <h2>All Tasks</h2>
+          <div class="table-wrap">
+            <table id="taskTable">
+              <colgroup>
+                <col class="col-title" />
+                <col class="col-status" />
+                <col class="col-category" />
+                <col class="col-assigned" />
+                <col class="col-due" />
+                <col class="col-actions" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Status</th>
+                  <th>Category</th>
+                  <th>Assigned To</th>
+                  <th>Due Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="taskBody">
+                <tr>
+                  <td colspan="6" class="empty">
+                    <div class="icon">&#128203;</div>
+                    <p>No tasks yet. Create one!</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ── Confirm Modal ── -->
+    <div class="modal-overlay" id="confirmOverlay">
+      <div class="modal">
+        <div class="modal-icon">&#128465;</div>
+        <h3>Delete Task</h3>
+        <p>
+          Are you sure you want to delete this task? This action cannot be
+          undone.
+        </p>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" id="confirmCancel">Cancel</button>
+          <button class="btn btn-danger" id="confirmDelete">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+      const API = "/api/tasks";
+      let editingId = null;
+
+      // ── Init ──
+      document.getElementById("headerDate").textContent =
+        new Date().toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+
+      document.getElementById("f-due").min = new Date()
+        .toISOString()
+        .split("T")[0];
+      loadTasks();
+
+      // ── Load & Render ──
+      async function loadTasks() {
+        const tasks = await apiFetch(API);
+        renderTable(tasks);
+        renderStats(tasks);
+      }
+
+      function renderStats(tasks) {
+        document.getElementById("stat-total").textContent = tasks.length;
+        document.getElementById("stat-todo").textContent = tasks.filter(
+          (t) => t.status === "TODO",
+        ).length;
+        document.getElementById("stat-inprogress").textContent = tasks.filter(
+          (t) => t.status === "IN_PROGRESS",
+        ).length;
+        document.getElementById("stat-done").textContent = tasks.filter(
+          (t) => t.status === "DONE",
+        ).length;
+      }
+
+      function renderTable(tasks) {
+        const tbody = document.getElementById("taskBody");
+        if (!tasks.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="6" class="empty"><div class="icon">&#128203;</div><p>No tasks yet. Create one!</p></td></tr>';
+          return;
+        }
+        tbody.innerHTML = [...tasks]
+          .reverse()
+          .map(
+            (t) => `
+      <tr>
+        <td class="td-title">
+          <span class="task-title" title="${esc(t.title)}">${esc(t.title)}</span>
+          ${t.description ? `<span class="task-desc" title="${esc(t.description)}">${esc(t.description)}</span>` : ""}
+        </td>
+        <td><span class="badge status-${t.status}">${fmt(t.status)}</span></td>
+        <td title="${esc(t.category || "")}">${esc(t.category || "—")}</td>
+        <td title="${esc(t.assignedTo || "")}">${esc(t.assignedTo || "—")}</td>
+        <td>${t.dueDate ? fmtDate(t.dueDate) : "—"}</td>
+        <td>
+          <div class="row-actions">
+            <button class="icon-btn edit"   onclick="startEdit('${t.id}')" title="Edit">&#9998;</button>
+            <button class="icon-btn delete" onclick="deleteTask('${t.id}')" title="Delete">&#128465;</button>
+          </div>
+        </td>
+      </tr>`,
+          )
+          .join("");
+      }
+
+      // ── Create / Update ──
+      async function submitForm() {
+        const title = document.getElementById("f-title").value.trim();
+        if (!title) {
+          toast("Title is required");
+          return;
+        }
+        const category = document.getElementById("f-category").value.trim();
+        if (!category) {
+          toast("Category is required");
+          return;
+        }
+
+        const dueRaw = document.getElementById("f-due").value;
+        const payload = {
+          title,
+          description: document.getElementById("f-desc").value.trim(),
+          status: document.getElementById("f-status").value,
+          category,
+          assignedTo: document.getElementById("f-assigned").value.trim(),
+          dueDate: dueRaw ? dueRaw + "T00:00:00" : null,
+        };
+
+        if (editingId) {
+          await apiFetch(`${API}/${editingId}`, "PUT", payload);
+          toast("Task updated");
+        } else {
+          await apiFetch(API, "POST", payload);
+          toast("Task created");
+        }
+        resetForm();
+        loadTasks();
+      }
+
+      // ── Edit ──
+      async function startEdit(id) {
+        const task = await apiFetch(`${API}/${id}`);
+        editingId = id;
+        document.getElementById("f-title").value = task.title || "";
+        document.getElementById("f-desc").value = task.description || "";
+        document.getElementById("f-status").value = task.status || "TODO";
+        document.getElementById("f-status").disabled = false;
+        document.getElementById("f-category").value = task.category || "";
+        document.getElementById("f-assigned").value = task.assignedTo || "";
+        document.getElementById("f-due").value = task.dueDate
+          ? task.dueDate.split("T")[0]
+          : "";
+        document.getElementById("formTitle").textContent = "Edit Task";
+        document.getElementById("submitLabel").textContent = "✓ Save Changes";
+        document.getElementById("cancelBtn").style.display = "inline-flex";
+        document.getElementById("f-title").focus();
+      }
+
+      // ── Delete ──
+      function confirmModal() {
+        return new Promise((resolve) => {
+          const overlay = document.getElementById("confirmOverlay");
+          overlay.classList.add("show");
+          function cleanup(result) {
+            overlay.classList.remove("show");
+            document
+              .getElementById("confirmDelete")
+              .removeEventListener("click", onConfirm);
+            document
+              .getElementById("confirmCancel")
+              .removeEventListener("click", onCancel);
+            overlay.removeEventListener("click", onBackdrop);
+            resolve(result);
+          }
+          function onConfirm() {
+            cleanup(true);
+          }
+          function onCancel() {
+            cleanup(false);
+          }
+          function onBackdrop(e) {
+            if (e.target === overlay) cleanup(false);
+          }
+          document
+            .getElementById("confirmDelete")
+            .addEventListener("click", onConfirm);
+          document
+            .getElementById("confirmCancel")
+            .addEventListener("click", onCancel);
+          overlay.addEventListener("click", onBackdrop);
+        });
+      }
+
+      async function deleteTask(id) {
+        if (!(await confirmModal())) return;
+        await apiFetch(`${API}/${id}`, "DELETE");
+        toast("Task deleted");
+        loadTasks();
+      }
+
+      // ── Reset form ──
+      function resetForm() {
+        editingId = null;
+        ["f-title", "f-desc", "f-category", "f-assigned", "f-due"].forEach(
+          (id) => (document.getElementById(id).value = ""),
+        );
+        document.getElementById("f-status").value = "TODO";
+        document.getElementById("f-status").disabled = true;
+        document.getElementById("formTitle").textContent = "New Task";
+        document.getElementById("submitLabel").textContent = "+ Create Task";
+        document.getElementById("cancelBtn").style.display = "none";
+        document.getElementById("f-due").min = new Date()
+          .toISOString()
+          .split("T")[0];
+      }
+
+      // ── Helpers ──
+      async function apiFetch(url, method = "GET", body = null) {
+        const opts = {
+          method,
+          headers: { "Content-Type": "application/json" },
+        };
+        if (body) opts.body = JSON.stringify(body);
+        const res = await fetch(url, opts);
+        if (method === "DELETE") return;
+        return res.json().catch(() => []);
+      }
+
+      function esc(str) {
+        return String(str ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      function fmt(status) {
+        return (
+          {
+            TODO: "To Do",
+            IN_PROGRESS: "In Progress",
+            DONE: "Done",
+            CANCELLED: "Cancelled",
+          }[status] || status
+        );
+      }
+
+      function fmtDate(iso) {
+        return new Date(iso).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        });
+      }
+
+      function toast(msg) {
+        const el = document.getElementById("toast");
+        el.textContent = msg;
+        el.classList.add("show");
+        setTimeout(() => el.classList.remove("show"), 2500);
+      }
+    </script>
+  </body>
+</html>
