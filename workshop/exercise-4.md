@@ -42,7 +42,7 @@ Create a technical implementation plan for priority support, search, and filters
 
 - How search and filter query params interact
 
-- Testing strategy for service layer changes
+
 ```
 
 > Spec Kit creates `.specify/plan.md`.
